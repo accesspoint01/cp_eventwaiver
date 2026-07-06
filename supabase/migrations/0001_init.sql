@@ -91,6 +91,23 @@ create table public.admin_allowlist (
 );
 
 -- =========================================================
+-- GRANTS
+-- =========================================================
+-- Table-level privileges are a separate layer from RLS: even service_role
+-- (which bypasses RLS policies entirely) still needs a basic GRANT to touch
+-- a table, or every query fails with "permission denied for table X" before
+-- RLS is ever evaluated. Supabase projects normally set this up via default
+-- privileges, but grant it explicitly here so this migration is
+-- self-contained and works even if that default is missing.
+
+grant usage on schema public to anon, authenticated, service_role;
+
+grant select, insert, update, delete on public.events to anon, authenticated, service_role;
+grant select, insert, update, delete on public.waiver_signatures to anon, authenticated, service_role;
+grant select, insert, update, delete on public.waiver_text_versions to anon, authenticated, service_role;
+grant select, insert, update, delete on public.admin_allowlist to anon, authenticated, service_role;
+
+-- =========================================================
 -- ROW LEVEL SECURITY
 -- =========================================================
 
@@ -220,6 +237,8 @@ select
   waiver_version
 from public.events
 where is_active = true;
+
+grant select on public.public_event_info to anon, authenticated, service_role;
 
 -- =========================================================
 -- Seed: initial admin + placeholder waiver text (v1)
