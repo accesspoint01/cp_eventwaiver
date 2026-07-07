@@ -17,6 +17,8 @@ export async function createEvent(
     third_party_name: formData.get("third_party_name") ?? "",
     event_date: formData.get("event_date"),
     slug: formData.get("slug"),
+    risk_clause: formData.get("risk_clause") ?? "",
+    includes_minors: formData.get("includes_minors") === "on",
   });
 
   if (!parsed.success) {
@@ -42,6 +44,8 @@ export async function createEvent(
       third_party_name: parsed.data.third_party_name || null,
       event_date: parsed.data.event_date,
       slug: parsed.data.slug,
+      risk_clause: parsed.data.risk_clause || null,
+      includes_minors: parsed.data.includes_minors ?? false,
       waiver_version: currentVersion?.version ?? "v1",
       created_by: user?.id ?? null,
     })

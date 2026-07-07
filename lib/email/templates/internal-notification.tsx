@@ -6,7 +6,6 @@ type Props = {
   fullName: string;
   email: string;
   phone: string;
-  teamName: string | null;
   emergencyContactName: string;
   emergencyContactPhone: string;
   signedAt: string;
@@ -18,7 +17,6 @@ export default function InternalNotificationEmail({
   fullName,
   email,
   phone,
-  teamName,
   emergencyContactName,
   emergencyContactPhone,
   signedAt,
@@ -37,9 +35,6 @@ export default function InternalNotificationEmail({
             <Text style={{ margin: 0 }}><strong>Nombre:</strong> {fullName}</Text>
             <Text style={{ margin: 0 }}><strong>Email:</strong> {email}</Text>
             <Text style={{ margin: 0 }}><strong>Teléfono:</strong> {phone}</Text>
-            {teamName ? (
-              <Text style={{ margin: 0 }}><strong>Equipo/organización:</strong> {teamName}</Text>
-            ) : null}
             <Text style={{ margin: 0 }}>
               <strong>Contacto de emergencia:</strong> {emergencyContactName} ({emergencyContactPhone})
             </Text>

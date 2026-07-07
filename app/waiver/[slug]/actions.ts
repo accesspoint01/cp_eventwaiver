@@ -19,7 +19,6 @@ export async function submitSignature(
     full_name: formData.get("full_name"),
     email: formData.get("email"),
     phone: formData.get("phone"),
-    team_name: formData.get("team_name") ?? "",
     emergency_contact_name: formData.get("emergency_contact_name"),
     emergency_contact_phone: formData.get("emergency_contact_phone"),
     accepted_terms: formData.get("accepted_terms") === "on",
@@ -40,18 +39,19 @@ export async function submitSignature(
   const userAgent = h.get("user-agent");
 
   const supabase = await createClient();
-  const { team_name, ...rest } = parsed.data;
+  const signedAt = new Date().toISOString();
 
-  const { data: inserted, error } = await supabase
-    .from("waiver_signatures")
-    .insert({
-      ...rest,
-      team_name: team_name || null,
-      ip_address: ip,
-      user_agent: userAgent,
-    })
-    .select("signed_at")
-    .single();
+  // Deliberately not chaining .select() here: anon has no SELECT policy on
+  // waiver_signatures (so nobody can read others' signed data), and
+  // INSERT ... RETURNING requires that same visibility — requesting the row
+  // back would fail with a misleading "violates row-level security policy"
+  // error even though the insert itself is allowed.
+  const { error } = await supabase.from("waiver_signatures").insert({
+    ...parsed.data,
+    signed_at: signedAt,
+    ip_address: ip,
+    user_agent: userAgent,
+  });
 
   if (error) {
     console.error("Error guardando firma:", error);
@@ -82,10 +82,9 @@ export async function submitSignature(
         full_name: parsed.data.full_name,
         email: parsed.data.email,
         phone: parsed.data.phone,
-        team_name: team_name || null,
         emergency_contact_name: parsed.data.emergency_contact_name,
         emergency_contact_phone: parsed.data.emergency_contact_phone,
-        signed_at: inserted?.signed_at ?? new Date().toISOString(),
+        signed_at: signedAt,
       },
       { name: event.name, companyLine, eventDate },
     );

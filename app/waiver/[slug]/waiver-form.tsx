@@ -1,7 +1,24 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { submitSignature, type SubmitState } from "./actions";
+
+const markdownComponents = {
+  h2: (props: React.ComponentPropsWithoutRef<"h2">) => (
+    <h2 className="mt-4 text-base font-semibold text-zinc-900 first:mt-0" {...props} />
+  ),
+  h3: (props: React.ComponentPropsWithoutRef<"h3">) => (
+    <h3 className="mt-4 text-sm font-semibold text-zinc-900 first:mt-0" {...props} />
+  ),
+  p: (props: React.ComponentPropsWithoutRef<"p">) => (
+    <p className="mt-2 first:mt-0" {...props} />
+  ),
+  strong: (props: React.ComponentPropsWithoutRef<"strong">) => (
+    <strong className="font-semibold text-zinc-900" {...props} />
+  ),
+  hr: () => <hr className="my-4 border-zinc-200" />,
+};
 
 const initialState: SubmitState = { ok: false };
 
@@ -82,11 +99,6 @@ function SignatureForm({
         />
       </div>
 
-      <div>
-        <label className={labelClass} htmlFor="team_name">Equipo/organización (opcional)</label>
-        <input id="team_name" name="team_name" className={inputClass} />
-      </div>
-
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className={labelClass} htmlFor="emergency_contact_name">
@@ -163,11 +175,11 @@ export default function WaiverForm({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-zinc-900">{eventName}</h1>
+        <h1 className="text-xl font-semibold text-zinc-900">Waiver: {eventName}</h1>
       </header>
 
-      <div className="max-h-72 overflow-y-auto whitespace-pre-wrap rounded-lg border border-zinc-200 bg-white p-4 text-sm text-zinc-700">
-        {waiverText}
+      <div className="max-h-[32rem] overflow-y-auto rounded-lg border border-zinc-200 bg-white p-4 text-sm text-zinc-700 sm:max-h-[40rem]">
+        <ReactMarkdown components={markdownComponents}>{waiverText}</ReactMarkdown>
       </div>
 
       <SignatureForm

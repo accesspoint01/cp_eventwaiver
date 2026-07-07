@@ -76,6 +76,28 @@ export default function NewEventPage() {
           />
         </div>
 
+        <div>
+          <label className="text-sm font-medium text-zinc-700">
+            Cláusula de riesgo específico (opcional)
+          </label>
+          <p className="mb-1 text-xs text-zinc-500">
+            Solo para actividades de riesgo medio/alto (agua, alturas, retos físicos intensos,
+            equipo especializado). Se agrega dentro de la sección de asunción de riesgo del
+            waiver. Déjalo en blanco para actividades de bajo riesgo.
+          </p>
+          <textarea
+            name="risk_clause"
+            rows={3}
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-base"
+          />
+        </div>
+
+        <label className="flex items-start gap-2 text-sm text-zinc-700">
+          <input type="checkbox" name="includes_minors" className="mt-1 h-4 w-4" />
+          Este evento incluye participantes menores de 18 años (agrega la sección de
+          consentimiento de padre/madre/tutor).
+        </label>
+
         {state.error && (
           <p className="text-sm text-red-600" role="alert">{state.error}</p>
         )}

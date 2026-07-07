@@ -7,6 +7,8 @@ export type Event = {
   slug: string;
   is_active: boolean;
   waiver_version: string;
+  risk_clause: string | null;
+  includes_minors: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -22,6 +24,8 @@ export type PublicEventInfo = Pick<
   | "slug"
   | "is_active"
   | "waiver_version"
+  | "risk_clause"
+  | "includes_minors"
 >;
 
 export type WaiverSignature = {
@@ -30,7 +34,6 @@ export type WaiverSignature = {
   full_name: string;
   email: string;
   phone: string;
-  team_name: string | null;
   emergency_contact_name: string;
   emergency_contact_phone: string;
   accepted_terms: boolean;

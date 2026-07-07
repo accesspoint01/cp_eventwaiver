@@ -17,7 +17,6 @@ export async function sendConfirmationEmails(
     | "full_name"
     | "email"
     | "phone"
-    | "team_name"
     | "emergency_contact_name"
     | "emergency_contact_phone"
     | "signed_at"
@@ -57,7 +56,6 @@ export async function sendConfirmationEmails(
         fullName: signature.full_name,
         email: signature.email,
         phone: signature.phone,
-        teamName: signature.team_name,
         emergencyContactName: signature.emergency_contact_name,
         emergencyContactPhone: signature.emergency_contact_phone,
         signedAt: signature.signed_at,

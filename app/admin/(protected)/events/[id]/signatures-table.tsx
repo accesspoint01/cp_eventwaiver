@@ -10,17 +10,14 @@ export default function SignaturesTable({ signatures }: { signatures: WaiverSign
     const q = query.trim().toLowerCase();
     if (!q) return signatures;
     return signatures.filter(
-      (s) =>
-        s.full_name.toLowerCase().includes(q) ||
-        s.email.toLowerCase().includes(q) ||
-        (s.team_name ?? "").toLowerCase().includes(q),
+      (s) => s.full_name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q),
     );
   }, [signatures, query]);
 
   return (
     <div className="space-y-3">
       <input
-        placeholder="Buscar por nombre, email o equipo..."
+        placeholder="Buscar por nombre o email..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="h-10 w-full max-w-sm rounded-md border border-zinc-300 px-3 text-sm"
@@ -33,7 +30,6 @@ export default function SignaturesTable({ signatures }: { signatures: WaiverSign
               <th className="px-3 py-2">Nombre</th>
               <th className="px-3 py-2">Email</th>
               <th className="px-3 py-2">Teléfono</th>
-              <th className="px-3 py-2">Equipo</th>
               <th className="px-3 py-2">Contacto emergencia</th>
               <th className="px-3 py-2">Firmado</th>
             </tr>
@@ -44,7 +40,6 @@ export default function SignaturesTable({ signatures }: { signatures: WaiverSign
                 <td className="px-3 py-2">{s.full_name}</td>
                 <td className="px-3 py-2">{s.email}</td>
                 <td className="px-3 py-2">{s.phone}</td>
-                <td className="px-3 py-2">{s.team_name ?? "—"}</td>
                 <td className="px-3 py-2">
                   {s.emergency_contact_name} ({s.emergency_contact_phone})
                 </td>
@@ -53,7 +48,7 @@ export default function SignaturesTable({ signatures }: { signatures: WaiverSign
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-3 py-6 text-center text-zinc-500">
+                <td colSpan={5} className="px-3 py-6 text-center text-zinc-500">
                   Sin firmas todavía.
                 </td>
               </tr>

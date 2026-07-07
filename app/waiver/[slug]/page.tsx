@@ -39,11 +39,13 @@ export default async function WaiverPage({
     company_name: event.company_name,
     third_party_name: event.third_party_name,
     event_date: eventDate,
+    risk_clause: event.risk_clause,
+    includes_minors: event.includes_minors,
   });
 
   return (
     <main className="min-h-screen bg-zinc-50 px-4 py-8">
-      <div className="mx-auto max-w-md">
+      <div className="mx-auto max-w-md sm:max-w-2xl lg:max-w-3xl">
         <WaiverForm
           eventId={event.id}
           eventName={event.name}
