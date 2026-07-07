@@ -11,7 +11,7 @@ firmas.
 2. Copia `.env.example` a `.env.local` y llena las variables:
    - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` — del proyecto Supabase existente.
    - `RESEND_API_KEY` — API key de Resend.
-   - `EMAIL_FROM` / `EMAIL_INTERNAL_TO` — ya configurados a `myevent@centerpointpr.com` / `connect@centerpointpr.com`.
+   - `EMAIL_FROM` / `EMAIL_INTERNAL_TO` — ambos usan `myevent@centerpointpr.com` (`connect@centerpointpr.com` es solo un alias del mismo buzón).
 3. Aplica la migración `supabase/migrations/0001_init.sql` en el proyecto Supabase (SQL Editor o `supabase db push`). Esto crea las tablas, políticas RLS, y siembra un admin inicial (`kerenacevedo@accesspointpr.com`) más el texto legal `v1` (placeholder — pendiente de revisión legal).
 4. `npm run dev` y abre `http://localhost:3000`.
 
