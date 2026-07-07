@@ -21,6 +21,7 @@ export async function sendMagicLink(
   });
 
   if (error) {
+    console.error("Error enviando magic link:", error);
     return { ok: false, error: "No se pudo enviar el link. Intenta de nuevo." };
   }
 
