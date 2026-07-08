@@ -30,7 +30,7 @@ export default async function EventDetailPage({
     .returns<WaiverSignature[]>();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-  const waiverUrl = `${siteUrl}/waiver/${event.slug}`;
+  const waiverUrl = `${siteUrl}/${event.slug}`;
   const parties = [event.company_name, event.third_party_name].filter(Boolean);
 
   return (
