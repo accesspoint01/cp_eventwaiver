@@ -71,7 +71,7 @@ function SignatureForm({
 
       <div>
         <h2 className="mb-2 text-sm font-semibold text-zinc-900">
-          1. Relevo de responsabilidad
+          Relevo de responsabilidad
         </h2>
         <div className={textBoxClass}>
           <ReactMarkdown components={markdownComponents}>{liabilityText}</ReactMarkdown>
@@ -89,7 +89,7 @@ function SignatureForm({
 
       <div>
         <h2 className="mb-2 text-sm font-semibold text-zinc-900">
-          2. Autorización de uso de imagen
+          Autorización de uso de imagen
         </h2>
         <div className={textBoxClass}>
           <ReactMarkdown components={markdownComponents}>{imageText}</ReactMarkdown>
@@ -224,8 +224,8 @@ export default function WaiverForm({
         <Image
           src="/cp-logo.png"
           alt="Center Point"
-          width={140}
-          height={79}
+          width={105}
+          height={59}
           className="mb-3"
           priority
         />

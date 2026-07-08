@@ -43,10 +43,14 @@ export default async function WaiverPage({
     includes_minors: event.includes_minors,
   });
 
-  // The stored legal text has a {{SECTION_SPLIT}} marker right before the
-  // photo/image authorization section, so the form can show it as its own
-  // block with its own (independent, declinable) checkbox.
-  const [liabilityText, imageText = ""] = waiverText.split("{{SECTION_SPLIT}}");
+  // The stored legal text has two {{SECTION_SPLIT}} markers bracketing the
+  // photo/image authorization section, so it can be shown as its own block
+  // with its own (independent, declinable) checkbox. Everything else
+  // (including general closing provisions like severability/governing law)
+  // stays together in the liability block.
+  const [before = "", middle = "", after = ""] = waiverText.split("{{SECTION_SPLIT}}");
+  const liabilityText = [before, after].filter((part) => part.trim()).join("\n\n").trim();
+  const imageText = middle.trim();
 
   return (
     <main className="min-h-screen bg-zinc-50 px-4 py-8">
