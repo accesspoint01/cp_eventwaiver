@@ -9,3 +9,14 @@ export async function toggleActive(eventId: string, isActive: boolean) {
   revalidatePath(`/admin/events/${eventId}`);
   revalidatePath("/admin");
 }
+
+export async function deleteSignature(eventId: string, signatureId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("waiver_signatures").delete().eq("id", signatureId);
+  if (error) {
+    console.error("Error borrando firma:", error);
+    return { ok: false };
+  }
+  revalidatePath(`/admin/events/${eventId}`);
+  return { ok: true };
+}

@@ -86,6 +86,8 @@ export async function submitSignature(
         phone: parsed.data.phone,
         emergency_contact_name: parsed.data.emergency_contact_name,
         emergency_contact_phone: parsed.data.emergency_contact_phone,
+        accepted_liability: parsed.data.accepted_liability,
+        accepted_image_use: parsed.data.accepted_image_use,
         signed_at: signedAt,
       },
       { name: event.name, companyLine, eventDate },

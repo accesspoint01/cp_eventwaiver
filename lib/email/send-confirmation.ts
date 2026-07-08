@@ -19,6 +19,8 @@ export async function sendConfirmationEmails(
     | "phone"
     | "emergency_contact_name"
     | "emergency_contact_phone"
+    | "accepted_liability"
+    | "accepted_image_use"
     | "signed_at"
   >,
   event: EventInfo,
@@ -63,6 +65,8 @@ export async function sendConfirmationEmails(
         phone: signature.phone,
         emergencyContactName: signature.emergency_contact_name,
         emergencyContactPhone: signature.emergency_contact_phone,
+        acceptedLiability: signature.accepted_liability,
+        acceptedImageUse: signature.accepted_image_use,
         signedAt: signature.signed_at,
       }),
     }),

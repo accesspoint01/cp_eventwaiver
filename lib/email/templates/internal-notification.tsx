@@ -8,6 +8,8 @@ type Props = {
   phone: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
+  acceptedLiability: boolean;
+  acceptedImageUse: boolean;
   signedAt: string;
 };
 
@@ -19,6 +21,8 @@ export default function InternalNotificationEmail({
   phone,
   emergencyContactName,
   emergencyContactPhone,
+  acceptedLiability,
+  acceptedImageUse,
   signedAt,
 }: Props) {
   return (
@@ -37,6 +41,12 @@ export default function InternalNotificationEmail({
             <Text style={{ margin: 0 }}><strong>Teléfono:</strong> {phone}</Text>
             <Text style={{ margin: 0 }}>
               <strong>Contacto de emergencia:</strong> {emergencyContactName} ({emergencyContactPhone})
+            </Text>
+            <Text style={{ margin: 0 }}>
+              <strong>Responsabilidad:</strong> {acceptedLiability ? "Sí" : "No"}
+            </Text>
+            <Text style={{ margin: 0 }}>
+              <strong>Imagen:</strong> {acceptedImageUse ? "Sí" : "No"}
             </Text>
             <Text style={{ margin: 0 }}><strong>Firmado:</strong> {signedAt}</Text>
           </Section>

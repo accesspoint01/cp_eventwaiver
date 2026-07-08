@@ -30,7 +30,7 @@ export default async function ProtectedAdminLayout({
 
   return (
     <div>
-      <nav className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-3">
+      <nav className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-3 print:hidden">
         <Link href="/admin" className="font-semibold text-zinc-900">
           Center Point — Waivers
         </Link>

@@ -5,6 +5,7 @@ import type { Event, WaiverSignature } from "@/types/domain";
 import { toggleActive } from "./actions";
 import QrPanel from "./qr-panel";
 import SignaturesTable from "./signatures-table";
+import PrintButton from "./print-button";
 
 export default async function EventDetailPage({
   params,
@@ -35,7 +36,7 @@ export default async function EventDetailPage({
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-6">
-      <div>
+      <div className="print:hidden">
         <Link href="/admin" className="text-sm text-zinc-500 hover:text-zinc-900">
           ← Eventos
         </Link>
@@ -59,22 +60,31 @@ export default async function EventDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-[240px_1fr]">
-        <QrPanel url={waiverUrl} />
+      <h1 className="hidden text-xl font-semibold text-zinc-900 print:block">
+        {event.name} — {parties.length ? parties.join(" / ") : "Sin cliente"} · {event.event_date}
+      </h1>
+
+      <div className="grid gap-6 sm:grid-cols-[240px_1fr] print:block">
+        <div className="print:hidden">
+          <QrPanel url={waiverUrl} />
+        </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-medium text-zinc-900">
               Firmas recibidas ({signatures?.length ?? 0})
             </h2>
-            <a
-              href={`/admin/events/${event.id}/export`}
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700"
-            >
-              Exportar CSV
-            </a>
+            <div className="flex items-center gap-2 print:hidden">
+              <PrintButton />
+              <a
+                href={`/admin/events/${event.id}/export`}
+                className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700"
+              >
+                Exportar CSV
+              </a>
+            </div>
           </div>
-          <SignaturesTable signatures={signatures ?? []} />
+          <SignaturesTable eventId={event.id} signatures={signatures ?? []} />
         </div>
       </div>
     </main>
