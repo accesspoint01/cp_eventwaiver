@@ -21,8 +21,10 @@ export async function submitSignature(
     phone: formData.get("phone"),
     emergency_contact_name: formData.get("emergency_contact_name"),
     emergency_contact_phone: formData.get("emergency_contact_phone"),
-    accepted_terms: formData.get("accepted_terms") === "on",
+    accepted_liability: formData.get("accepted_liability") === "on",
+    accepted_image_use: formData.get("accepted_image_use") === "on",
     signature_name: formData.get("signature_name"),
+    reviewed_confirmation: formData.get("reviewed_confirmation") === "on",
     waiver_version: formData.get("waiver_version"),
   });
 

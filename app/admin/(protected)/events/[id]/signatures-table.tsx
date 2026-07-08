@@ -31,6 +31,8 @@ export default function SignaturesTable({ signatures }: { signatures: WaiverSign
               <th className="px-3 py-2">Email</th>
               <th className="px-3 py-2">Teléfono</th>
               <th className="px-3 py-2">Contacto emergencia</th>
+              <th className="px-3 py-2">Responsabilidad</th>
+              <th className="px-3 py-2">Imagen</th>
               <th className="px-3 py-2">Firmado</th>
             </tr>
           </thead>
@@ -43,12 +45,14 @@ export default function SignaturesTable({ signatures }: { signatures: WaiverSign
                 <td className="px-3 py-2">
                   {s.emergency_contact_name} ({s.emergency_contact_phone})
                 </td>
+                <td className="px-3 py-2">{s.accepted_liability ? "Sí" : "No"}</td>
+                <td className="px-3 py-2">{s.accepted_image_use ? "Sí" : "No"}</td>
                 <td className="px-3 py-2">{new Date(s.signed_at).toLocaleString("es-PR")}</td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-3 py-6 text-center text-zinc-500">
+                <td colSpan={7} className="px-3 py-6 text-center text-zinc-500">
                   Sin firmas todavía.
                 </td>
               </tr>

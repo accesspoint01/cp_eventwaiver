@@ -7,10 +7,14 @@ export const signatureSchema = z.object({
   phone: z.string().trim().min(7, "Escribe un teléfono válido"),
   emergency_contact_name: z.string().trim().min(2, "Escribe un contacto de emergencia"),
   emergency_contact_phone: z.string().trim().min(7, "Escribe un teléfono de emergencia válido"),
-  accepted_terms: z.literal(true, {
-    message: "Debes aceptar los términos para continuar",
+  accepted_liability: z.literal(true, {
+    message: "Debes aceptar el relevo de responsabilidad para continuar",
   }),
+  accepted_image_use: z.boolean(),
   signature_name: z.string().trim().min(2, "Escribe tu nombre como firma"),
+  reviewed_confirmation: z.literal(true, {
+    message: "Debes confirmar que revisaste toda la información",
+  }),
   waiver_version: z.string().min(1),
 });
 

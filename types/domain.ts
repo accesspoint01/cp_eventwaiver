@@ -36,7 +36,9 @@ export type WaiverSignature = {
   phone: string;
   emergency_contact_name: string;
   emergency_contact_phone: string;
-  accepted_terms: boolean;
+  accepted_liability: boolean;
+  accepted_image_use: boolean;
+  reviewed_confirmation: boolean;
   signature_name: string;
   waiver_version: string;
   signed_at: string;

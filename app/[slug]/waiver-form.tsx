@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import { submitSignature, type SubmitState } from "./actions";
 
@@ -25,14 +26,20 @@ const initialState: SubmitState = { ok: false };
 const inputClass =
   "h-12 w-full rounded-md border border-zinc-300 px-3 text-base text-zinc-900 focus:border-zinc-500 focus:outline-none";
 const labelClass = "text-sm font-medium text-zinc-700";
+const textBoxClass =
+  "max-h-80 overflow-y-auto rounded-lg border border-zinc-200 bg-white p-4 text-sm text-zinc-700 sm:max-h-96";
 
 function SignatureForm({
   eventId,
   waiverVersion,
+  liabilityText,
+  imageText,
   onSignAnother,
 }: {
   eventId: string;
   waiverVersion: string;
+  liabilityText: string;
+  imageText: string;
   onSignAnother: () => void;
 }) {
   const [state, formAction, isPending] = useActionState(submitSignature, initialState);
@@ -61,6 +68,38 @@ function SignatureForm({
     <form action={formAction} className="space-y-4">
       <input type="hidden" name="event_id" value={eventId} />
       <input type="hidden" name="waiver_version" value={waiverVersion} />
+
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-zinc-900">
+          1. Relevo de responsabilidad
+        </h2>
+        <div className={textBoxClass}>
+          <ReactMarkdown components={markdownComponents}>{liabilityText}</ReactMarkdown>
+        </div>
+        <label className="mt-3 flex items-start gap-2 text-sm text-zinc-700">
+          <input
+            type="checkbox"
+            name="accepted_liability"
+            required
+            className="mt-1 h-4 w-4"
+          />
+          He leído y acepto los términos del relevo de responsabilidad.
+        </label>
+      </div>
+
+      <div>
+        <h2 className="mb-2 text-sm font-semibold text-zinc-900">
+          2. Autorización de uso de imagen
+        </h2>
+        <div className={textBoxClass}>
+          <ReactMarkdown components={markdownComponents}>{imageText}</ReactMarkdown>
+        </div>
+        <label className="mt-3 flex items-start gap-2 text-sm text-zinc-700">
+          <input type="checkbox" name="accepted_image_use" className="mt-1 h-4 w-4" />
+          Autorizo el uso de mis fotos/video como se describe arriba. (Puedes participar
+          sin marcar esto.)
+        </label>
+      </div>
 
       <div>
         <label className={labelClass} htmlFor="full_name">Nombre completo</label>
@@ -126,12 +165,6 @@ function SignatureForm({
         </div>
       </div>
 
-      <label className="flex items-start gap-2 text-sm text-zinc-700">
-        <input type="checkbox" name="accepted_terms" required className="mt-1 h-4 w-4" />
-        He leído y acepto los términos del relevo de responsabilidad y la
-        autorización de uso de imagen.
-      </label>
-
       <div>
         <label className={labelClass} htmlFor="signature_name">
           Firma (escribe tu nombre completo)
@@ -143,6 +176,17 @@ function SignatureForm({
           className={inputClass}
         />
       </div>
+
+      <label className="flex items-start gap-2 text-sm text-zinc-700">
+        <input
+          type="checkbox"
+          name="reviewed_confirmation"
+          required
+          className="mt-1 h-4 w-4"
+        />
+        Confirmo que revisé toda la información anterior (relevo de responsabilidad y
+        autorización de uso de imagen) antes de firmar.
+      </label>
 
       {state.error && (
         <p className="text-sm text-red-600" role="alert">{state.error}</p>
@@ -163,29 +207,40 @@ export default function WaiverForm({
   eventId,
   eventName,
   waiverVersion,
-  waiverText,
+  liabilityText,
+  imageText,
 }: {
   eventId: string;
   eventName: string;
   waiverVersion: string;
-  waiverText: string;
+  liabilityText: string;
+  imageText: string;
 }) {
   const [instanceKey, setInstanceKey] = useState(0);
 
   return (
     <div className="space-y-6">
       <header>
+        <Image
+          src="/cp-logo.png"
+          alt="Center Point"
+          width={140}
+          height={79}
+          className="mb-3"
+          priority
+        />
         <h1 className="text-xl font-semibold text-zinc-900">Waiver: {eventName}</h1>
+        <p className="mt-1 text-sm text-zinc-600">
+          Formulario de relevo de responsabilidad y autorización de uso de imagen
+        </p>
       </header>
-
-      <div className="max-h-[32rem] overflow-y-auto rounded-lg border border-zinc-200 bg-white p-4 text-sm text-zinc-700 sm:max-h-[40rem]">
-        <ReactMarkdown components={markdownComponents}>{waiverText}</ReactMarkdown>
-      </div>
 
       <SignatureForm
         key={instanceKey}
         eventId={eventId}
         waiverVersion={waiverVersion}
+        liabilityText={liabilityText}
+        imageText={imageText}
         onSignAnother={() => setInstanceKey((k) => k + 1)}
       />
     </div>

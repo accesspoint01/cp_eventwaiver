@@ -29,7 +29,7 @@ export async function GET(
   const { data, error } = await supabase
     .from("waiver_signatures")
     .select(
-      "full_name,email,phone,emergency_contact_name,emergency_contact_phone,signature_name,signed_at,waiver_version",
+      "full_name,email,phone,emergency_contact_name,emergency_contact_phone,accepted_liability,accepted_image_use,signature_name,signed_at,waiver_version,ip_address,user_agent",
     )
     .eq("event_id", id)
     .order("signed_at", { ascending: true });
