@@ -49,34 +49,34 @@ export default function SignaturesTable({
         className="h-10 w-full max-w-sm rounded-md border border-zinc-300 px-3 text-sm print:hidden"
       />
 
-      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
-        <table className="w-full min-w-[720px] text-left text-sm">
+      <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white print:overflow-visible print:rounded-none print:border-0">
+        <table className="w-full min-w-[720px] table-auto text-left text-sm print:min-w-0 print:w-full print:table-fixed print:text-[10px]">
           <thead className="bg-zinc-50 text-zinc-500">
             <tr>
-              <th className="px-3 py-2">#</th>
-              <th className="px-3 py-2">Nombre</th>
-              <th className="px-3 py-2">Email</th>
-              <th className="px-3 py-2">Teléfono</th>
-              <th className="px-3 py-2">Contacto emergencia</th>
-              <th className="px-3 py-2">Responsabilidad</th>
-              <th className="px-3 py-2">Imagen</th>
-              <th className="px-3 py-2">Firmado</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">#</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">Nombre</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">Email</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">Teléfono</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">Contacto emergencia</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">Responsabilidad</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">Imagen</th>
+              <th className="px-3 py-2 print:px-1 print:py-1">Firmado</th>
               <th className="px-3 py-2 print:hidden">Borrar</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {filtered.map((s) => (
               <tr key={s.id}>
-                <td className="px-3 py-2 text-zinc-500">{s.rowNumber}</td>
-                <td className="px-3 py-2">{s.full_name}</td>
-                <td className="px-3 py-2">{s.email}</td>
-                <td className="px-3 py-2">{s.phone}</td>
-                <td className="px-3 py-2">
+                <td className="px-3 py-2 text-zinc-500 print:px-1 print:py-1">{s.rowNumber}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1">{s.full_name}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1">{s.email}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1">{s.phone}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1">
                   {s.emergency_contact_name} ({s.emergency_contact_phone})
                 </td>
-                <td className="px-3 py-2">{s.accepted_liability ? "Sí" : "No"}</td>
-                <td className="px-3 py-2">{s.accepted_image_use ? "Sí" : "No"}</td>
-                <td className="px-3 py-2">{new Date(s.signed_at).toLocaleString("es-PR")}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1">{s.accepted_liability ? "Sí" : "No"}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1">{s.accepted_image_use ? "Sí" : "No"}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1">{new Date(s.signed_at).toLocaleString("es-PR")}</td>
                 <td className="px-3 py-2 print:hidden">
                   <button
                     type="button"
