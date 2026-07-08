@@ -34,6 +34,11 @@ export async function sendConfirmationEmails(
 
   const resend = new Resend(apiKey);
 
+  // resend.emails.send() does NOT reject/throw on API-level failures (bad
+  // from address, quota exceeded, etc.) — it resolves with { data: null,
+  // error }. Promise.allSettled only catches network-level rejections, so
+  // the resolved `.error` field has to be checked explicitly too, or real
+  // send failures go completely unlogged.
   const [participantResult, internalResult] = await Promise.allSettled([
     resend.emails.send({
       from,
@@ -65,8 +70,13 @@ export async function sendConfirmationEmails(
 
   if (participantResult.status === "rejected") {
     console.error("Error enviando email de confirmación al participante:", participantResult.reason);
+  } else if (participantResult.value.error) {
+    console.error("Resend rechazó el email de confirmación al participante:", participantResult.value.error);
   }
+
   if (internalResult.status === "rejected") {
     console.error("Error enviando email de notificación interna:", internalResult.reason);
+  } else if (internalResult.value.error) {
+    console.error("Resend rechazó el email de notificación interna:", internalResult.value.error);
   }
 }
