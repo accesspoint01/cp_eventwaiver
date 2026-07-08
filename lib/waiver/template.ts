@@ -48,7 +48,7 @@ function riskClauseBlock(riskClause: string | null): string {
 function minorsBlock(includesMinors: boolean): string {
   if (!includesMinors) return "";
   return (
-    "### 7. Menores de edad\n\n" +
+    "### Menores de edad\n\n" +
     "Si algún participante es menor de 18 años, este Relevo debe ser firmado por su padre, madre o tutor legal, quien asume en su representación los términos aquí establecidos.\n"
   );
 }
