@@ -5,6 +5,37 @@ import { useRouter } from "next/navigation";
 import type { WaiverSignature } from "@/types/domain";
 import { deleteSignature } from "./actions";
 
+type SortKey =
+  | "full_name"
+  | "email"
+  | "phone"
+  | "emergency_contact_name"
+  | "accepted_liability"
+  | "accepted_image_use"
+  | "signed_at";
+
+type SortDir = "asc" | "desc";
+
+const columns: { key: SortKey; label: string }[] = [
+  { key: "full_name", label: "Nombre" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Teléfono" },
+  { key: "emergency_contact_name", label: "Contacto emergencia" },
+  { key: "accepted_liability", label: "Responsabilidad" },
+  { key: "accepted_image_use", label: "Imagen" },
+  { key: "signed_at", label: "Firmado" },
+];
+
+function compareValues(a: WaiverSignature, b: WaiverSignature, key: SortKey): number {
+  if (key === "signed_at") {
+    return new Date(a.signed_at).getTime() - new Date(b.signed_at).getTime();
+  }
+  if (key === "accepted_liability" || key === "accepted_image_use") {
+    return Number(a[key]) - Number(b[key]);
+  }
+  return a[key].localeCompare(b[key], "es", { sensitivity: "base" });
+}
+
 export default function SignaturesTable({
   eventId,
   signatures,
@@ -13,10 +44,14 @@ export default function SignaturesTable({
   signatures: WaiverSignature[];
 }) {
   const [query, setQuery] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
+  // Row numbers reflect the original signing order and stay fixed to each
+  // person regardless of how the table is currently sorted.
   const numbered = useMemo(
     () => signatures.map((s, i) => ({ ...s, rowNumber: i + 1 })),
     [signatures],
@@ -29,6 +64,22 @@ export default function SignaturesTable({
       (s) => s.full_name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q),
     );
   }, [numbered, query]);
+
+  const sorted = useMemo(() => {
+    if (!sortKey) return filtered;
+    const copy = [...filtered];
+    copy.sort((a, b) => compareValues(a, b, sortKey) * (sortDir === "asc" ? 1 : -1));
+    return copy;
+  }, [filtered, sortKey, sortDir]);
+
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  }
 
   function handleDelete(id: string, name: string) {
     if (!confirm(`¿Borrar la firma de "${name}"? Esto no se puede deshacer.`)) return;
@@ -65,18 +116,25 @@ export default function SignaturesTable({
           <thead className="bg-zinc-50 text-zinc-500">
             <tr>
               <th className="px-3 py-2 print:px-1 print:py-1">#</th>
-              <th className="px-3 py-2 print:px-1 print:py-1">Nombre</th>
-              <th className="px-3 py-2 print:px-1 print:py-1">Email</th>
-              <th className="px-3 py-2 print:px-1 print:py-1">Teléfono</th>
-              <th className="px-3 py-2 print:px-1 print:py-1">Contacto emergencia</th>
-              <th className="px-3 py-2 print:px-1 print:py-1">Responsabilidad</th>
-              <th className="px-3 py-2 print:px-1 print:py-1">Imagen</th>
-              <th className="px-3 py-2 print:px-1 print:py-1">Firmado</th>
+              {columns.map((col) => (
+                <th key={col.key} className="px-3 py-2 print:px-1 print:py-1">
+                  <button
+                    type="button"
+                    onClick={() => handleSort(col.key)}
+                    className="flex items-center gap-1 font-medium hover:text-zinc-900 print:pointer-events-none"
+                  >
+                    {col.label}
+                    <span className="w-3 text-zinc-400">
+                      {sortKey === col.key ? (sortDir === "asc" ? "▲" : "▼") : ""}
+                    </span>
+                  </button>
+                </th>
+              ))}
               <th className="px-3 py-2 print:hidden">Borrar</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
-            {filtered.map((s) => (
+            {sorted.map((s) => (
               <tr key={s.id}>
                 <td className="px-3 py-2 text-zinc-500 print:px-1 print:py-1">{s.rowNumber}</td>
                 <td className="px-3 py-2 print:px-1 print:py-1 print:break-words">{s.full_name}</td>
@@ -100,7 +158,7 @@ export default function SignaturesTable({
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
+            {sorted.length === 0 && (
               <tr>
                 <td colSpan={9} className="px-3 py-6 text-center text-zinc-500">
                   Sin firmas todavía.
