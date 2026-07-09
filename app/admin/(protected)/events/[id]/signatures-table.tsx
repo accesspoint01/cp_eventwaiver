@@ -51,6 +51,17 @@ export default function SignaturesTable({
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white print:overflow-visible print:rounded-none print:border-0">
         <table className="w-full min-w-[720px] table-auto text-left text-sm print:min-w-0 print:w-full print:table-fixed print:text-[10px]">
+          <colgroup>
+            <col className="print:w-[3%]" />
+            <col className="print:w-[13%]" />
+            <col className="print:w-[20%]" />
+            <col className="print:w-[10%]" />
+            <col className="print:w-[19%]" />
+            <col className="print:w-[10%]" />
+            <col className="print:w-[9%]" />
+            <col className="print:w-[16%]" />
+            <col className="print:hidden" />
+          </colgroup>
           <thead className="bg-zinc-50 text-zinc-500">
             <tr>
               <th className="px-3 py-2 print:px-1 print:py-1">#</th>
@@ -68,10 +79,10 @@ export default function SignaturesTable({
             {filtered.map((s) => (
               <tr key={s.id}>
                 <td className="px-3 py-2 text-zinc-500 print:px-1 print:py-1">{s.rowNumber}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1">{s.full_name}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1">{s.email}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1 print:break-words">{s.full_name}</td>
+                <td className="px-3 py-2 print:px-1 print:py-1 print:break-all">{s.email}</td>
                 <td className="px-3 py-2 print:px-1 print:py-1">{s.phone}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1">
+                <td className="px-3 py-2 print:px-1 print:py-1 print:break-words">
                   {s.emergency_contact_name} ({s.emergency_contact_phone})
                 </td>
                 <td className="px-3 py-2 print:px-1 print:py-1">{s.accepted_liability ? "Sí" : "No"}</td>

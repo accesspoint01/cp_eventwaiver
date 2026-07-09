@@ -35,7 +35,7 @@ export default async function EventDetailPage({
   const parties = [event.company_name, event.third_party_name].filter(Boolean);
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-6">
+    <main className="mx-auto max-w-3xl space-y-6 p-6 print:max-w-none print:p-0">
       <div className="print:hidden">
         <Link href="/admin" className="text-sm text-zinc-500 hover:text-zinc-900">
           ← Eventos
