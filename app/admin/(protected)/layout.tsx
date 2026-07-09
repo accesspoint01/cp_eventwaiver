@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "../login/actions";
 
@@ -31,14 +32,20 @@ export default async function ProtectedAdminLayout({
   return (
     <div>
       <nav className="flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-3 print:hidden">
-        <Link href="/admin" className="font-semibold text-zinc-900">
+        <Link href="/admin" className="flex items-center gap-2 font-semibold text-zinc-900">
+          <Image src="/cp-logo.png" alt="Center Point" width={32} height={18} />
           Center Point — Waivers
         </Link>
-        <form action={signOut}>
-          <button type="submit" className="text-sm text-zinc-500 hover:text-zinc-900">
-            Cerrar sesión
-          </button>
-        </form>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/team" className="text-sm text-zinc-500 hover:text-zinc-900">
+            Administradores
+          </Link>
+          <form action={signOut}>
+            <button type="submit" className="text-sm text-zinc-500 hover:text-zinc-900">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       </nav>
       {children}
     </div>

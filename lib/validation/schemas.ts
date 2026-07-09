@@ -42,3 +42,10 @@ export const eventSchema = z.object({
 });
 
 export type EventInput = z.infer<typeof eventSchema>;
+
+export const adminSchema = z.object({
+  name: z.string().trim().min(2, "Escribe el nombre"),
+  email: z.string().trim().toLowerCase().email("Escribe un email válido"),
+});
+
+export type AdminInput = z.infer<typeof adminSchema>;

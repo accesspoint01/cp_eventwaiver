@@ -121,11 +121,11 @@ export default function SignaturesTable({
                   <button
                     type="button"
                     onClick={() => handleSort(col.key)}
-                    className="flex items-center gap-1 font-medium hover:text-zinc-900 print:pointer-events-none"
+                    className="flex cursor-pointer items-center gap-1 font-medium hover:text-zinc-900 print:pointer-events-none"
                   >
                     {col.label}
-                    <span className="w-3 text-zinc-400">
-                      {sortKey === col.key ? (sortDir === "asc" ? "▲" : "▼") : ""}
+                    <span className={sortKey === col.key ? "text-zinc-700" : "text-zinc-300"}>
+                      {sortKey === col.key ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}
                     </span>
                   </button>
                 </th>
@@ -136,16 +136,16 @@ export default function SignaturesTable({
           <tbody className="divide-y divide-zinc-100">
             {sorted.map((s) => (
               <tr key={s.id}>
-                <td className="px-3 py-2 text-zinc-500 print:px-1 print:py-1">{s.rowNumber}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1 print:break-words">{s.full_name}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1 print:break-all">{s.email}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1">{s.phone}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1 print:break-words">
+                <td className="whitespace-nowrap px-3 py-2 text-zinc-500 print:px-1 print:py-1">{s.rowNumber}</td>
+                <td className="whitespace-nowrap px-3 py-2 print:whitespace-normal print:break-words print:px-1 print:py-1">{s.full_name}</td>
+                <td className="whitespace-nowrap px-3 py-2 print:whitespace-normal print:break-all print:px-1 print:py-1">{s.email}</td>
+                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{s.phone}</td>
+                <td className="whitespace-nowrap px-3 py-2 print:whitespace-normal print:break-words print:px-1 print:py-1">
                   {s.emergency_contact_name} ({s.emergency_contact_phone})
                 </td>
-                <td className="px-3 py-2 print:px-1 print:py-1">{s.accepted_liability ? "Sí" : "No"}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1">{s.accepted_image_use ? "Sí" : "No"}</td>
-                <td className="px-3 py-2 print:px-1 print:py-1">{new Date(s.signed_at).toLocaleString("es-PR")}</td>
+                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{s.accepted_liability ? "Sí" : "No"}</td>
+                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{s.accepted_image_use ? "Sí" : "No"}</td>
+                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{new Date(s.signed_at).toLocaleString("es-PR")}</td>
                 <td className="px-3 py-2 print:hidden">
                   <button
                     type="button"
