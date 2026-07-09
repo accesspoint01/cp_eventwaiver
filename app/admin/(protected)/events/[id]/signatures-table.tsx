@@ -50,20 +50,13 @@ export default function SignaturesTable({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
-  // Row numbers reflect the original signing order and stay fixed to each
-  // person regardless of how the table is currently sorted.
-  const numbered = useMemo(
-    () => signatures.map((s, i) => ({ ...s, rowNumber: i + 1 })),
-    [signatures],
-  );
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return numbered;
-    return numbered.filter(
+    if (!q) return signatures;
+    return signatures.filter(
       (s) => s.full_name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q),
     );
-  }, [numbered, query]);
+  }, [signatures, query]);
 
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
@@ -71,6 +64,10 @@ export default function SignaturesTable({
     copy.sort((a, b) => compareValues(a, b, sortKey) * (sortDir === "asc" ? 1 : -1));
     return copy;
   }, [filtered, sortKey, sortDir]);
+
+  // # always reflects the current on-screen position (1..N for whatever is
+  // currently sorted/filtered), not a fixed per-person identifier.
+  const numbered = useMemo(() => sorted.map((s, i) => ({ ...s, rowNumber: i + 1 })), [sorted]);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -134,7 +131,7 @@ export default function SignaturesTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
-            {sorted.map((s) => (
+            {numbered.map((s) => (
               <tr key={s.id}>
                 <td className="whitespace-nowrap px-3 py-2 text-zinc-500 print:px-1 print:py-1">{s.rowNumber}</td>
                 <td className="whitespace-nowrap px-3 py-2 print:whitespace-normal print:break-words print:px-1 print:py-1">{s.full_name}</td>
@@ -158,7 +155,7 @@ export default function SignaturesTable({
                 </td>
               </tr>
             ))}
-            {sorted.length === 0 && (
+            {numbered.length === 0 && (
               <tr>
                 <td colSpan={9} className="px-3 py-6 text-center text-zinc-500">
                   Sin firmas todavía.
