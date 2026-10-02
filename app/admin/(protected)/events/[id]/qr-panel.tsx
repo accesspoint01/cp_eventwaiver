@@ -13,16 +13,18 @@ export default function QrPanel({ url }: { url: string }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-zinc-200 bg-white p-4">
-      <QRCodeSVG value={url} size={160} />
-      <p className="break-all text-center text-sm text-zinc-600">{url}</p>
-      <button
-        type="button"
-        onClick={copyLink}
-        className="h-10 w-full rounded-md border border-zinc-300 text-sm font-medium text-zinc-700"
-      >
-        {copied ? "¡Copiado!" : "Copiar link"}
-      </button>
+    <div className="flex w-fit max-w-full items-center gap-4 rounded-lg border border-zinc-200 bg-white p-3">
+      <QRCodeSVG value={url} size={96} className="shrink-0" />
+      <div className="min-w-0 space-y-2">
+        <p className="break-all text-sm text-zinc-600">{url}</p>
+        <button
+          type="button"
+          onClick={copyLink}
+          className="h-9 rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-700"
+        >
+          {copied ? "¡Copiado!" : "Copiar link"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import { z } from "zod";
 
-export const signatureSchema = z.object({
+// Fields every signer fills in, adult or guardian. waiver_version is NOT
+// here on purpose: the server derives it from the event so what gets
+// stored always matches the text that was actually shown.
+const signatureBase = z.object({
   event_id: z.string().uuid(),
-  full_name: z.string().trim().min(2, "Escribe tu nombre completo"),
   email: z.string().trim().email("Escribe un email válido"),
   phone: z.string().trim().min(7, "Escribe un teléfono válido"),
   emergency_contact_name: z.string().trim().min(2, "Escribe un contacto de emergencia"),
@@ -15,8 +17,40 @@ export const signatureSchema = z.object({
   reviewed_confirmation: z.literal(true, {
     message: "Debes confirmar que revisaste toda la información",
   }),
-  waiver_version: z.string().min(1),
 });
+
+const adultSignatureSchema = signatureBase.extend({
+  signer_type: z.literal("adult"),
+  first_name: z.string().trim().min(1, "Escribe tu nombre"),
+  last_name: z.string().trim().min(1, "Escribe tu apellido"),
+});
+
+// For guardian signatures first_name/last_name are the MINOR participant;
+// the guardian_* fields are the adult who signs.
+const guardianSignatureSchema = signatureBase
+  .extend({
+    signer_type: z.literal("guardian"),
+    first_name: z.string().trim().min(1, "Escribe el nombre del menor"),
+    last_name: z.string().trim().min(1, "Escribe el apellido del menor"),
+    guardian_first_name: z.string().trim().min(1, "Escribe tu nombre"),
+    guardian_last_name: z.string().trim().min(1, "Escribe tu apellido"),
+    guardian_relationship: z.enum(["padre", "madre", "tutor"], {
+      message: "Indica tu relación con el menor",
+    }),
+    has_medical_info: z.boolean({
+      message: "Indica si el menor tiene alergias o toma medicamentos",
+    }),
+    medical_info: z.string().trim().max(1000, "Máximo 1000 caracteres").optional(),
+  })
+  .refine((d) => !d.has_medical_info || (d.medical_info ?? "").length > 0, {
+    message: "Describe las alergias, condiciones o medicamentos del menor",
+    path: ["medical_info"],
+  });
+
+export const signatureSchema = z.discriminatedUnion("signer_type", [
+  adultSignatureSchema,
+  guardianSignatureSchema,
+]);
 
 export type SignatureInput = z.infer<typeof signatureSchema>;
 
@@ -38,7 +72,7 @@ export const eventSchema = z.object({
       message: "Ese link está reservado, escoge otro",
     }),
   risk_clause: z.string().trim().max(2000).optional().or(z.literal("")),
-  includes_minors: z.boolean().optional(),
+  audience: z.enum(["adults", "minors"], { message: "Escoge el tipo de participantes" }),
 });
 
 export type EventInput = z.infer<typeof eventSchema>;

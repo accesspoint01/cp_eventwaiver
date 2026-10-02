@@ -1,39 +1,158 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { WaiverSignature } from "@/types/domain";
 import { deleteSignature } from "./actions";
 
-type SortKey =
-  | "full_name"
-  | "email"
-  | "phone"
-  | "emergency_contact_name"
-  | "accepted_liability"
-  | "accepted_image_use"
-  | "signed_at";
-
 type SortDir = "asc" | "desc";
 
-const columns: { key: SortKey; label: string }[] = [
-  { key: "full_name", label: "Nombre" },
-  { key: "email", label: "Email" },
-  { key: "phone", label: "Teléfono" },
-  { key: "emergency_contact_name", label: "Contacto emergencia" },
-  { key: "accepted_liability", label: "Responsabilidad" },
-  { key: "accepted_image_use", label: "Imagen" },
-  { key: "signed_at", label: "Firmado" },
+type Column = {
+  id: string;
+  label: string;
+  // Tailwind print width class for the <col>, tuned per column set so the
+  // whole table fits one landscape page.
+  printWidth: string;
+  // Long cells wrap on screen with this minimum width; the rest stay on one line.
+  screenMinWidth?: string;
+  printBreak?: "print:break-words" | "print:break-all";
+  sortValue: (s: WaiverSignature) => string | number;
+  render: (s: WaiverSignature) => ReactNode;
+};
+
+const relationshipLabel: Record<string, string> = {
+  padre: "padre",
+  madre: "madre",
+  tutor: "tutor(a)",
+};
+
+function guardianName(s: WaiverSignature): string {
+  return `${s.guardian_first_name ?? ""} ${s.guardian_last_name ?? ""}`.trim();
+}
+
+function yesNo(value: boolean) {
+  return value ? "Sí" : "No";
+}
+
+const firstName: Column = {
+  id: "first_name",
+  label: "Nombre",
+  printWidth: "print:w-[11%]",
+  printBreak: "print:break-words",
+  sortValue: (s) => s.first_name,
+  render: (s) => s.first_name,
+};
+
+const lastName: Column = {
+  id: "last_name",
+  label: "Apellido",
+  printWidth: "print:w-[12%]",
+  printBreak: "print:break-words",
+  sortValue: (s) => s.last_name,
+  render: (s) => s.last_name,
+};
+
+const email: Column = {
+  id: "email",
+  label: "Email",
+  printWidth: "print:w-[19%]",
+  printBreak: "print:break-all",
+  sortValue: (s) => s.email,
+  render: (s) => s.email,
+};
+
+const phone: Column = {
+  id: "phone",
+  label: "Teléfono",
+  printWidth: "print:w-[10%]",
+  sortValue: (s) => s.phone,
+  render: (s) => s.phone,
+};
+
+const emergency: Column = {
+  id: "emergency",
+  label: "Contacto emergencia",
+  printWidth: "print:w-[16%]",
+  screenMinWidth: "min-w-[9rem]",
+  printBreak: "print:break-words",
+  sortValue: (s) => s.emergency_contact_name,
+  render: (s) => `${s.emergency_contact_name} (${s.emergency_contact_phone})`,
+};
+
+const liability: Column = {
+  id: "liability",
+  label: "Responsabilidad",
+  printWidth: "print:w-[10%]",
+  sortValue: (s) => Number(s.accepted_liability),
+  render: (s) => yesNo(s.accepted_liability),
+};
+
+const image: Column = {
+  id: "image",
+  label: "Imagen",
+  printWidth: "print:w-[7%]",
+  sortValue: (s) => Number(s.accepted_image_use),
+  render: (s) => yesNo(s.accepted_image_use),
+};
+
+const signed: Column = {
+  id: "signed",
+  label: "Firmado",
+  printWidth: "print:w-[12%]",
+  sortValue: (s) => new Date(s.signed_at).getTime(),
+  render: (s) => new Date(s.signed_at).toLocaleString("es-PR"),
+};
+
+const adultColumns: Column[] = [
+  firstName,
+  lastName,
+  email,
+  phone,
+  emergency,
+  liability,
+  image,
+  signed,
 ];
 
-function compareValues(a: WaiverSignature, b: WaiverSignature, key: SortKey): number {
-  if (key === "signed_at") {
-    return new Date(a.signed_at).getTime() - new Date(b.signed_at).getTime();
-  }
-  if (key === "accepted_liability" || key === "accepted_image_use") {
-    return Number(a[key]) - Number(b[key]);
-  }
-  return a[key].localeCompare(b[key], "es", { sensitivity: "base" });
+// Events with guardian signatures: first/last name are the minor; email and
+// phone belong to the guardian. Medical info is shown because it's what
+// staff most need on the printed sheet at the event.
+const guardianColumns: Column[] = [
+  { ...firstName, printWidth: "print:w-[8%]" },
+  { ...lastName, printWidth: "print:w-[9%]" },
+  {
+    id: "guardian",
+    label: "Padre/tutor",
+    printWidth: "print:w-[11%]",
+    screenMinWidth: "min-w-[9rem]",
+    printBreak: "print:break-words",
+    sortValue: (s) => guardianName(s),
+    render: (s) =>
+      s.signer_type === "guardian"
+        ? `${guardianName(s)} (${relationshipLabel[s.guardian_relationship ?? ""] ?? ""})`
+        : "—",
+  },
+  { ...email, label: "Email (tutor)", printWidth: "print:w-[13%]" },
+  { ...phone, label: "Tel. (tutor)", printWidth: "print:w-[8%]" },
+  { ...emergency, printWidth: "print:w-[11%]" },
+  {
+    id: "medical",
+    label: "Alergias / medicamentos",
+    printWidth: "print:w-[13%]",
+    screenMinWidth: "min-w-[13rem]",
+    printBreak: "print:break-words",
+    sortValue: (s) => (s.has_medical_info ? 1 : 0),
+    render: (s) =>
+      s.has_medical_info === null ? "—" : s.has_medical_info ? `Sí: ${s.medical_info ?? ""}` : "No",
+  },
+  { ...liability, printWidth: "print:w-[9%]" },
+  { ...image, printWidth: "print:w-[6%]" },
+  { ...signed, printWidth: "print:w-[8%]" },
+];
+
+function compare(a: string | number, b: string | number): number {
+  if (typeof a === "number" && typeof b === "number") return a - b;
+  return String(a).localeCompare(String(b), "es", { sensitivity: "base" });
 }
 
 export default function SignaturesTable({
@@ -44,36 +163,45 @@ export default function SignaturesTable({
   signatures: WaiverSignature[];
 }) {
   const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortId, setSortId] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
+  const hasGuardian = signatures.some((s) => s.signer_type === "guardian");
+  const columns = hasGuardian ? guardianColumns : adultColumns;
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return signatures;
     return signatures.filter(
-      (s) => s.full_name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q),
+      (s) =>
+        s.full_name.toLowerCase().includes(q) ||
+        s.email.toLowerCase().includes(q) ||
+        guardianName(s).toLowerCase().includes(q),
     );
   }, [signatures, query]);
 
   const sorted = useMemo(() => {
-    if (!sortKey) return filtered;
+    const column = columns.find((c) => c.id === sortId);
+    if (!column) return filtered;
     const copy = [...filtered];
-    copy.sort((a, b) => compareValues(a, b, sortKey) * (sortDir === "asc" ? 1 : -1));
+    copy.sort(
+      (a, b) => compare(column.sortValue(a), column.sortValue(b)) * (sortDir === "asc" ? 1 : -1),
+    );
     return copy;
-  }, [filtered, sortKey, sortDir]);
+  }, [filtered, columns, sortId, sortDir]);
 
   // # always reflects the current on-screen position (1..N for whatever is
   // currently sorted/filtered), not a fixed per-person identifier.
   const numbered = useMemo(() => sorted.map((s, i) => ({ ...s, rowNumber: i + 1 })), [sorted]);
 
-  function handleSort(key: SortKey) {
-    if (sortKey === key) {
+  function handleSort(id: string) {
+    if (sortId === id) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
-      setSortKey(key);
+      setSortId(id);
       setSortDir("asc");
     }
   }
@@ -98,52 +226,53 @@ export default function SignaturesTable({
       />
 
       <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white print:overflow-visible print:rounded-none print:border-0">
-        <table className="w-full min-w-[720px] table-auto text-left text-sm print:min-w-0 print:w-full print:table-fixed print:text-[10px]">
+        <table className="w-full min-w-[720px] table-auto text-left text-[13px] print:min-w-0 print:w-full print:table-fixed print:text-[10px]">
           <colgroup>
             <col className="print:w-[3%]" />
-            <col className="print:w-[13%]" />
-            <col className="print:w-[20%]" />
-            <col className="print:w-[10%]" />
-            <col className="print:w-[19%]" />
-            <col className="print:w-[10%]" />
-            <col className="print:w-[9%]" />
-            <col className="print:w-[16%]" />
+            {columns.map((col) => (
+              <col key={col.id} className={col.printWidth} />
+            ))}
             <col className="print:hidden" />
           </colgroup>
           <thead className="bg-zinc-50 text-zinc-500">
             <tr>
-              <th className="px-3 py-2 print:px-1 print:py-1">#</th>
+              <th className="px-2 py-2 print:px-1 print:py-1">#</th>
               {columns.map((col) => (
-                <th key={col.key} className="px-3 py-2 print:px-1 print:py-1">
+                <th key={col.id} className="px-2 py-2 print:px-1 print:py-1">
                   <button
                     type="button"
-                    onClick={() => handleSort(col.key)}
-                    className="flex cursor-pointer items-center gap-1 font-medium hover:text-zinc-900 print:pointer-events-none"
+                    onClick={() => handleSort(col.id)}
+                    className="flex cursor-pointer items-center gap-1 text-left font-medium hover:text-zinc-900 print:pointer-events-none"
                   >
                     {col.label}
-                    <span className={sortKey === col.key ? "text-zinc-700" : "text-zinc-300"}>
-                      {sortKey === col.key ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}
+                    <span className={sortId === col.id ? "text-zinc-700" : "text-zinc-300"}>
+                      {sortId === col.id ? (sortDir === "asc" ? "▲" : "▼") : "⇅"}
                     </span>
                   </button>
                 </th>
               ))}
-              <th className="px-3 py-2 print:hidden">Borrar</th>
+              <th className="px-2 py-2 print:hidden">Borrar</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
             {numbered.map((s) => (
               <tr key={s.id}>
-                <td className="whitespace-nowrap px-3 py-2 text-zinc-500 print:px-1 print:py-1">{s.rowNumber}</td>
-                <td className="whitespace-nowrap px-3 py-2 print:whitespace-normal print:break-words print:px-1 print:py-1">{s.full_name}</td>
-                <td className="whitespace-nowrap px-3 py-2 print:whitespace-normal print:break-all print:px-1 print:py-1">{s.email}</td>
-                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{s.phone}</td>
-                <td className="whitespace-nowrap px-3 py-2 print:whitespace-normal print:break-words print:px-1 print:py-1">
-                  {s.emergency_contact_name} ({s.emergency_contact_phone})
+                <td className="whitespace-nowrap px-2 py-2 text-zinc-500 print:px-1 print:py-1">
+                  {s.rowNumber}
                 </td>
-                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{s.accepted_liability ? "Sí" : "No"}</td>
-                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{s.accepted_image_use ? "Sí" : "No"}</td>
-                <td className="whitespace-nowrap px-3 py-2 print:px-1 print:py-1">{new Date(s.signed_at).toLocaleString("es-PR")}</td>
-                <td className="px-3 py-2 print:hidden">
+                {columns.map((col) => (
+                  <td
+                    key={col.id}
+                    className={[
+                      "px-2 py-2 print:px-1 print:py-1",
+                      col.screenMinWidth ?? "whitespace-nowrap print:whitespace-normal",
+                      col.printBreak ?? "",
+                    ].join(" ")}
+                  >
+                    {col.render(s)}
+                  </td>
+                ))}
+                <td className="px-2 py-2 print:hidden">
                   <button
                     type="button"
                     onClick={() => handleDelete(s.id, s.full_name)}
@@ -157,7 +286,7 @@ export default function SignaturesTable({
             ))}
             {numbered.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-3 py-6 text-center text-zinc-500">
+                <td colSpan={columns.length + 2} className="px-3 py-6 text-center text-zinc-500">
                   Sin firmas todavía.
                 </td>
               </tr>

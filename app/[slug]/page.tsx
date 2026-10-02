@@ -20,10 +20,14 @@ export default async function WaiverPage({
 
   if (!event) notFound();
 
+  const isMinorsEvent = event.audience === "minors";
+  const textVersionName = isMinorsEvent ? event.guardian_waiver_version : event.waiver_version;
+  if (!textVersionName) notFound();
+
   const { data: textVersion } = await supabase
     .from("waiver_text_versions")
     .select("*")
-    .eq("version", event.waiver_version)
+    .eq("version", textVersionName)
     .maybeSingle<WaiverTextVersion>();
 
   if (!textVersion) notFound();
@@ -40,7 +44,6 @@ export default async function WaiverPage({
     third_party_name: event.third_party_name,
     event_date: eventDate,
     risk_clause: event.risk_clause,
-    includes_minors: event.includes_minors,
   });
 
   // The stored legal text has two {{SECTION_SPLIT}} markers bracketing the
@@ -58,9 +61,9 @@ export default async function WaiverPage({
         <WaiverForm
           eventId={event.id}
           eventName={event.name}
-          waiverVersion={event.waiver_version}
-          liabilityText={liabilityText.trim()}
-          imageText={imageText.trim()}
+          signerType={isMinorsEvent ? "guardian" : "adult"}
+          liabilityText={liabilityText}
+          imageText={imageText}
         />
       </div>
     </main>

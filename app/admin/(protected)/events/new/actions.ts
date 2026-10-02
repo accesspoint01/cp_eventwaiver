@@ -18,7 +18,7 @@ export async function createEvent(
     event_date: formData.get("event_date"),
     slug: formData.get("slug"),
     risk_clause: formData.get("risk_clause") ?? "",
-    includes_minors: formData.get("includes_minors") === "on",
+    audience: formData.get("audience"),
   });
 
   if (!parsed.success) {
@@ -33,8 +33,30 @@ export async function createEvent(
   const { data: currentVersion } = await supabase
     .from("waiver_text_versions")
     .select("version")
+    .eq("kind", "adult")
     .eq("is_current", true)
     .maybeSingle();
+
+  if (!currentVersion) {
+    return { ok: false, error: "No hay un texto legal vigente para adultos configurado." };
+  }
+
+  // The guardian text in use is the most recently created 'guardian' row.
+  let guardianVersion: string | null = null;
+  if (parsed.data.audience === "minors") {
+    const { data: latestGuardian } = await supabase
+      .from("waiver_text_versions")
+      .select("version")
+      .eq("kind", "guardian")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!latestGuardian) {
+      return { ok: false, error: "No hay un texto legal para padres/tutores configurado." };
+    }
+    guardianVersion = latestGuardian.version;
+  }
 
   const { data: event, error } = await supabase
     .from("events")
@@ -45,8 +67,9 @@ export async function createEvent(
       event_date: parsed.data.event_date,
       slug: parsed.data.slug,
       risk_clause: parsed.data.risk_clause || null,
-      includes_minors: parsed.data.includes_minors ?? false,
-      waiver_version: currentVersion?.version ?? "v1",
+      audience: parsed.data.audience,
+      waiver_version: currentVersion.version,
+      guardian_waiver_version: guardianVersion,
       created_by: user?.id ?? null,
     })
     .select("id")

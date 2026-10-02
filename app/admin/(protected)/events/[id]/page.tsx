@@ -35,7 +35,7 @@ export default async function EventDetailPage({
   const parties = [event.company_name, event.third_party_name].filter(Boolean);
 
   return (
-    <main className="mx-auto max-w-7xl space-y-6 p-6 print:max-w-none print:p-0">
+    <main className="mx-auto max-w-[1700px] space-y-6 p-6 print:max-w-none print:p-0">
       <div className="print:hidden">
         <Link href="/admin" className="text-sm text-zinc-500 hover:text-zinc-900">
           ← Eventos
@@ -64,28 +64,26 @@ export default async function EventDetailPage({
         {event.name} — {parties.length ? parties.join(" / ") : "Sin cliente"} · {event.event_date}
       </h1>
 
-      <div className="grid gap-6 sm:grid-cols-[240px_1fr] print:block">
-        <div className="print:hidden">
-          <QrPanel url={waiverUrl} />
-        </div>
+      <div className="print:hidden">
+        <QrPanel url={waiverUrl} />
+      </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-medium text-zinc-900">
-              Firmas recibidas ({signatures?.length ?? 0})
-            </h2>
-            <div className="flex items-center gap-2 print:hidden">
-              <PrintButton />
-              <a
-                href={`/admin/events/${event.id}/export`}
-                className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700"
-              >
-                Exportar CSV
-              </a>
-            </div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-medium text-zinc-900">
+            Firmas recibidas ({signatures?.length ?? 0})
+          </h2>
+          <div className="flex items-center gap-2 print:hidden">
+            <PrintButton />
+            <a
+              href={`/admin/events/${event.id}/export`}
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700"
+            >
+              Exportar CSV
+            </a>
           </div>
-          <SignaturesTable eventId={event.id} signatures={signatures ?? []} />
         </div>
+        <SignaturesTable eventId={event.id} signatures={signatures ?? []} />
       </div>
     </main>
   );

@@ -1,7 +1,6 @@
 import { Resend } from "resend";
 import ParticipantConfirmationEmail from "@/lib/email/templates/participant-confirmation";
 import InternalNotificationEmail from "@/lib/email/templates/internal-notification";
-import type { WaiverSignature } from "@/types/domain";
 
 type EventInfo = {
   name: string;
@@ -9,20 +8,29 @@ type EventInfo = {
   eventDate: string;
 };
 
+// What the emails need to know about a signature. For guardian signatures
+// the participant is the minor and the signer (who receives the
+// confirmation) is the guardian.
+export type ConfirmationSignature = {
+  signerType: "adult" | "guardian";
+  signerName: string;
+  participantName: string;
+  guardianRelationship: string | null;
+  email: string;
+  phone: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  hasMedicalInfo: boolean | null;
+  medicalInfo: string | null;
+  acceptedLiability: boolean;
+  acceptedImageUse: boolean;
+  signedAt: string;
+};
+
 // Fire-and-forget: email delivery failures are logged but never block or
 // undo the signature, which is already durably stored in Supabase.
 export async function sendConfirmationEmails(
-  signature: Pick<
-    WaiverSignature,
-    | "full_name"
-    | "email"
-    | "phone"
-    | "emergency_contact_name"
-    | "emergency_contact_phone"
-    | "accepted_liability"
-    | "accepted_image_use"
-    | "signed_at"
-  >,
+  signature: ConfirmationSignature,
   event: EventInfo,
 ) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -47,7 +55,9 @@ export async function sendConfirmationEmails(
       to: signature.email,
       subject: `Firma registrada — ${event.name}`,
       react: ParticipantConfirmationEmail({
-        fullName: signature.full_name,
+        signerName: signature.signerName,
+        participantName: signature.participantName,
+        isGuardian: signature.signerType === "guardian",
         eventName: event.name,
         companyLine: event.companyLine,
         eventDate: event.eventDate,
@@ -56,18 +66,23 @@ export async function sendConfirmationEmails(
     resend.emails.send({
       from,
       to: internalTo,
-      subject: `Nueva firma de waiver — ${event.name}`,
+      subject: `Nueva firma de waiver — ${signature.participantName} — ${event.name}`,
       react: InternalNotificationEmail({
         eventName: event.name,
         companyLine: event.companyLine,
-        fullName: signature.full_name,
+        signerType: signature.signerType,
+        signerName: signature.signerName,
+        participantName: signature.participantName,
+        guardianRelationship: signature.guardianRelationship,
         email: signature.email,
         phone: signature.phone,
-        emergencyContactName: signature.emergency_contact_name,
-        emergencyContactPhone: signature.emergency_contact_phone,
-        acceptedLiability: signature.accepted_liability,
-        acceptedImageUse: signature.accepted_image_use,
-        signedAt: signature.signed_at,
+        emergencyContactName: signature.emergencyContactName,
+        emergencyContactPhone: signature.emergencyContactPhone,
+        hasMedicalInfo: signature.hasMedicalInfo,
+        medicalInfo: signature.medicalInfo,
+        acceptedLiability: signature.acceptedLiability,
+        acceptedImageUse: signature.acceptedImageUse,
+        signedAt: signature.signedAt,
       }),
     }),
   ]);

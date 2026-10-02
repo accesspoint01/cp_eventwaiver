@@ -93,6 +93,30 @@ export default function NewEventForm({
           <input type="date" name="event_date" required className={inputClass} />
         </div>
 
+        <fieldset className="space-y-2 rounded-md border border-zinc-200 bg-white p-3">
+          <legend className="px-1 text-sm font-medium text-zinc-700">Participantes</legend>
+          <label className="flex items-start gap-2 text-sm text-zinc-700">
+            <input
+              type="radio"
+              name="audience"
+              value="adults"
+              defaultChecked
+              className="mt-1 h-4 w-4"
+            />
+            <span>
+              <strong className="font-medium">Adultos</strong> — cada persona firma por sí misma.
+            </span>
+          </label>
+          <label className="flex items-start gap-2 text-sm text-zinc-700">
+            <input type="radio" name="audience" value="minors" className="mt-1 h-4 w-4" />
+            <span>
+              <strong className="font-medium">Menores de edad</strong> — el padre, madre o tutor
+              legal firma por cada menor (datos del menor y del tutor, contacto de emergencia
+              y alergias/medicamentos).
+            </span>
+          </label>
+        </fieldset>
+
         <div>
           <label className="text-sm font-medium text-zinc-700">Link (slug)</label>
           <p className="mb-1 text-xs text-zinc-500">waiver.centerpointpr.com/{slug || "..."}</p>
@@ -123,12 +147,6 @@ export default function NewEventForm({
             className="w-full rounded-md border border-zinc-300 px-3 py-2 text-base"
           />
         </div>
-
-        <label className="flex items-start gap-2 text-sm text-zinc-700">
-          <input type="checkbox" name="includes_minors" className="mt-1 h-4 w-4" />
-          Este evento incluye participantes menores de 18 años (agrega la sección de
-          consentimiento de padre/madre/tutor).
-        </label>
 
         {state.error && (
           <p className="text-sm text-red-600" role="alert">{state.error}</p>
