@@ -6,6 +6,7 @@ import { toggleActive } from "./actions";
 import QrPanel from "./qr-panel";
 import SignaturesTable from "./signatures-table";
 import PrintButton from "./print-button";
+import DeleteEventButton from "../delete-event-button";
 
 export default async function EventDetailPage({
   params,
@@ -47,16 +48,31 @@ export default async function EventDetailPage({
               {parties.length ? parties.join(" / ") : "Sin cliente"} · {event.event_date}
             </p>
           </div>
-          <form action={toggleActive.bind(null, event.id, !event.is_active)}>
-            <button
-              type="submit"
-              className={`rounded-md px-4 py-2 text-sm font-medium ${
-                event.is_active ? "bg-zinc-100 text-zinc-700" : "bg-green-600 text-white"
-              }`}
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/admin/events/${event.id}/edit`}
+              className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700"
             >
-              {event.is_active ? "Desactivar" : "Activar"}
-            </button>
-          </form>
+              Editar
+            </Link>
+            <DeleteEventButton
+              eventId={event.id}
+              eventName={event.name}
+              signatureCount={signatures?.length ?? 0}
+              redirectTo="/admin"
+              className="rounded-md border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+            />
+            <form action={toggleActive.bind(null, event.id, !event.is_active)}>
+              <button
+                type="submit"
+                className={`rounded-md px-4 py-2 text-sm font-medium ${
+                  event.is_active ? "bg-zinc-100 text-zinc-700" : "bg-green-600 text-white"
+                }`}
+              >
+                {event.is_active ? "Desactivar" : "Activar"}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
 

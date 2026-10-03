@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import NewEventForm from "./new-event-form";
+import EventForm from "../event-form";
 
 function uniqueSorted(values: (string | null)[]): string[] {
   const set = new Set(values.filter((v): v is string => !!v && v.trim().length > 0));
@@ -15,7 +15,7 @@ export default async function NewEventPage() {
   const thirdPartyNames = uniqueSorted((data ?? []).map((e) => e.third_party_name));
 
   return (
-    <NewEventForm
+    <EventForm
       eventNames={eventNames}
       companyNames={companyNames}
       thirdPartyNames={thirdPartyNames}
